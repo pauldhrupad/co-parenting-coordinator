@@ -1,0 +1,21 @@
+{
+  "name": "co-parenting-coordinator",
+  "private": true,
+  "version": "1.0.0",
+  "engines": {
+    "node": "22.x"
+  },
+  "workspaces": ["client", "server"],
+  "scripts": {
+    "dev": "concurrently -n API,WEB -c blue,green \"npm run dev -w server\" \"npm run dev -w client\"",
+    "demo": "concurrently -n DEMO,WEB -c magenta,green \"npm run demo -w server\" \"npm run dev -w client\"",
+    "build": "npm run build -w client",
+    "test": "npm run test -w server && npm run test -w client",
+    "test:watch": "concurrently -n API-TEST,WEB-TEST -c blue,green \"npm run test:watch -w server\" \"npm run test:watch -w client\"",
+    "test:coverage": "npm run test:coverage -w server && npm run test:coverage -w client",
+    "seed": "npm run seed -w server"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  }
+}
