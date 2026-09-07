@@ -8,7 +8,14 @@ import { api } from "../lib/api";
 export default function LoginPage({ mode = "login" }) {
   const { login, register } = useAuth();
   const navigate = useNavigate();
-  const [form, setForm] = useState({ name: "", email: mode === "login" ? "dhruv@example.com" : "", password: mode === "login" ? "Demo1234!" : "" });
+  // Demo credentials belong to the local demo server and must never be
+  // advertised as valid accounts on a production deployment.
+  const showDemoLogin = mode === "login" && import.meta.env.DEV;
+  const [form, setForm] = useState({
+    name: "",
+    email: showDemoLogin ? "dhruv@example.com" : "",
+    password: showDemoLogin ? "Demo1234!" : "",
+  });
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
   const submit = async (event) => {
@@ -40,7 +47,7 @@ export default function LoginPage({ mode = "login" }) {
       <label>Email address<input type="email" required value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })}/></label>
       <label>Password<input type="password" required minLength="8" value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })}/></label>
       <button className="button primary full" disabled={busy}>{busy ? "Please wait…" : mode === "login" ? "Sign in" : "Create account"}</button>
-      {mode === "login" && <div className="demo-note"><strong>Demo account</strong><span>dhruv@example.com</span><span>Password: Demo1234!</span></div>}
+      {showDemoLogin && <div className="demo-note"><strong>Demo account</strong><span>dhruv@example.com</span><span>Password: Demo1234!</span></div>}
       <Link className="text-button switch" to={mode === "login" ? "/register" : "/login"}>{mode === "login" ? "Need an account? Register" : "Already registered? Sign in"}</Link>
     </form></section>
   </div>;
