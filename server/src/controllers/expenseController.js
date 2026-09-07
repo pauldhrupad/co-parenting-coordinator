@@ -131,6 +131,16 @@ async function reviewExpense(req, res, action) {
       familyName: family.name,
       actionUrl: `${config.clientUrl}/expenses`,
     }));
+  } else {
+    const recipient = await User.findById(expense.proposedBy).session(session).select("name email");
+    afterCommit(req, () => sendNotificationEmail(recipient?.email, "Expense approved", "expenseApproved", {
+      recipientName: recipient?.displayName,
+      actorName: req.user.displayName,
+      expenseTitle: expense.title,
+      amount: new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR" }).format(expense.amount),
+      familyName: family.name,
+      actionUrl: `${config.clientUrl}/expenses`,
+    }));
   }
   res.json({ success: true, expense: await populateExpense(expense) });
 }
@@ -153,6 +163,18 @@ export async function settleExpense(req, res) {
   expense.settledBy = req.user._id;
   expense.settledAt = new Date();
   await expense.save({ session });
+
+  const recipientId = family.parents.find((parentId) => !parentId.equals(req.user._id));
+  const recipient = await User.findById(recipientId).session(session).select("name email");
+  afterCommit(req, () => sendNotificationEmail(recipient?.email, "Expense settled", "expenseSettled", {
+    recipientName: recipient?.displayName,
+    actorName: req.user.displayName,
+    expenseTitle: expense.title,
+    amount: new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR" }).format(expense.amount),
+    familyName: family.name,
+    resolutionNote: expense.resolutionNote,
+    actionUrl: `${config.clientUrl}/expenses`,
+  }));
 
   res.json({ success: true, expense: await populateExpense(expense) });
 }

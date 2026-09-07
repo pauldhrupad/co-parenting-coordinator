@@ -23,6 +23,18 @@ const templates = {
       html: layout({ preheader: "A custody swap needs your response", heading: "New swap request", greeting: `Hello ${data.recipientName},`, body: `${data.actorName} proposed new custody dates and is waiting for your response.`, detailRows: [["Family", data.familyName], ["New start", formatDate(data.startDate)], ["New end", formatDate(data.endDate)]], actionLabel: "Review custody calendar", actionUrl: data.actionUrl }),
     };
   },
+  custodySwapAccepted(data) {
+    return {
+      text: `${data.actorName} accepted your custody swap request. The updated custody time is ${formatDate(data.startDate)} to ${formatDate(data.endDate)}. View it: ${data.actionUrl}`,
+      html: layout({ preheader: "Your custody swap was accepted", heading: "Custody swap accepted", greeting: `Hello ${data.recipientName},`, body: `${data.actorName} accepted your requested custody change. The new schedule is now confirmed.`, detailRows: [["Family", data.familyName], ["Confirmed start", formatDate(data.startDate)], ["Confirmed end", formatDate(data.endDate)]], actionLabel: "View custody calendar", actionUrl: data.actionUrl }),
+    };
+  },
+  custodySwapRejected(data) {
+    return {
+      text: `${data.actorName} declined your custody swap request. The original custody event remains unchanged. View it: ${data.actionUrl}`,
+      html: layout({ preheader: "Your custody swap was declined", heading: "Custody swap declined", greeting: `Hello ${data.recipientName},`, body: `${data.actorName} declined your requested custody change. The original confirmed schedule remains in place.`, detailRows: [["Family", data.familyName], ["Original start", formatDate(data.startDate)], ["Original end", formatDate(data.endDate)]], actionLabel: "View custody calendar", actionUrl: data.actionUrl }),
+    };
+  },
   newExpenseProposed(data) {
     return {
       text: `${data.actorName} proposed the expense "${data.expenseTitle}" for ${data.amount}. Sign in to review it: ${data.actionUrl}`,
@@ -33,6 +45,18 @@ const templates = {
     return {
       text: `${data.actorName} disputed "${data.expenseTitle}". Reason: ${data.reason}. View the record: ${data.actionUrl}`,
       html: layout({ preheader: "An expense was disputed", heading: "Expense disputed", greeting: `Hello ${data.recipientName},`, body: `${data.actorName} disputed an expense proposal. The reason is now part of its permanent history.`, detailRows: [["Expense", data.expenseTitle], ["Reason", data.reason], ["Family", data.familyName]], actionLabel: "View expense history", actionUrl: data.actionUrl }),
+    };
+  },
+  expenseApproved(data) {
+    return {
+      text: `${data.actorName} approved your expense proposal "${data.expenseTitle}" for ${data.amount}. View the record: ${data.actionUrl}`,
+      html: layout({ preheader: "Your expense proposal was approved", heading: "Expense approved", greeting: `Hello ${data.recipientName},`, body: `${data.actorName} approved your child-related expense proposal. It is now included in the shared balance.`, detailRows: [["Expense", data.expenseTitle], ["Amount", data.amount], ["Family", data.familyName]], actionLabel: "View expense", actionUrl: data.actionUrl }),
+    };
+  },
+  expenseSettled(data) {
+    return {
+      text: `${data.actorName} marked "${data.expenseTitle}" as settled. View the record: ${data.actionUrl}`,
+      html: layout({ preheader: "An expense was settled", heading: "Expense settled", greeting: `Hello ${data.recipientName},`, body: `${data.actorName} recorded that this expense was settled outside CoParent.`, detailRows: [["Expense", data.expenseTitle], ["Amount", data.amount], ["Family", data.familyName], ...(data.resolutionNote ? [["Resolution", data.resolutionNote]] : [])], actionLabel: "View expense", actionUrl: data.actionUrl }),
     };
   },
   generic(data) {

@@ -6,8 +6,12 @@ afterEach(() => setEmailTransportForTests(null));
 describe("notification email templates", () => {
   it.each([
     ["newSwapRequest", { recipientName: "Parent B", actorName: "Parent A", familyName: "Test Family", startDate: "2026-09-10T09:00:00Z", endDate: "2026-09-10T17:00:00Z" }, "New swap request"],
+    ["custodySwapAccepted", { recipientName: "Parent B", actorName: "Parent A", familyName: "Test Family", startDate: "2026-09-10T09:00:00Z", endDate: "2026-09-10T17:00:00Z" }, "Custody swap accepted"],
+    ["custodySwapRejected", { recipientName: "Parent B", actorName: "Parent A", familyName: "Test Family", startDate: "2026-09-10T09:00:00Z", endDate: "2026-09-10T17:00:00Z" }, "Custody swap declined"],
     ["newExpenseProposed", { recipientName: "Parent B", actorName: "Parent A", familyName: "Test Family", expenseTitle: "School books", amount: "₹1,200.00" }, "New expense proposed"],
     ["expenseDisputed", { recipientName: "Parent A", actorName: "Parent B", familyName: "Test Family", expenseTitle: "School books", reason: "Receipt required" }, "Expense disputed"],
+    ["expenseApproved", { recipientName: "Parent A", actorName: "Parent B", familyName: "Test Family", expenseTitle: "School books", amount: "₹1,200.00" }, "Expense approved"],
+    ["expenseSettled", { recipientName: "Parent B", actorName: "Parent A", familyName: "Test Family", expenseTitle: "School books", amount: "₹1,200.00", resolutionNote: "Receipt verified" }, "Expense settled"],
   ])("renders and sends the %s template", async (templateName, data, heading) => {
     const sendMail = vi.fn().mockResolvedValue({ messageId: "test-message" });
     setEmailTransportForTests({ sendMail });

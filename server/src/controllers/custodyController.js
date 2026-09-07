@@ -157,9 +157,18 @@ export async function respondToCustodySwap(req, res) {
   const original = await CustodyEvent.findById(pending.originalEvent).session(session);
   if (!original) throw new AppError(409, "The original custody event no longer exists");
   if (!original.assignedParent.equals(req.user._id)) throw new AppError(403, "Only the parent assigned to the original event can respond");
+  const requester = await User.findById(pending.requestedBy).session(session).select("name email");
 
   if (action === "reject") {
     await CustodyEvent.deleteOne({ _id: pending._id }, { session });
+    afterCommit(req, () => sendNotificationEmail(requester?.email, "Custody swap declined", "custodySwapRejected", {
+      recipientName: requester?.displayName,
+      actorName: req.user.displayName,
+      familyName: family.name,
+      startDate: original.startDate,
+      endDate: original.endDate,
+      actionUrl: `${config.clientUrl}/calendar`,
+    }));
     return res.json({ success: true, message: "Swap request rejected; the original event remains confirmed" });
   }
 
@@ -169,5 +178,13 @@ export async function respondToCustodySwap(req, res) {
   pending.status = "confirmed";
   pending.requestedBy = null;
   await pending.save({ session });
+  afterCommit(req, () => sendNotificationEmail(requester?.email, "Custody swap accepted", "custodySwapAccepted", {
+    recipientName: requester?.displayName,
+    actorName: req.user.displayName,
+    familyName: family.name,
+    startDate: pending.startDate,
+    endDate: pending.endDate,
+    actionUrl: `${config.clientUrl}/calendar`,
+  }));
   return res.json({ success: true, event: await populateEvent(pending), message: "Swap accepted and original event replaced" });
 }
