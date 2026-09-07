@@ -22,6 +22,26 @@
   --shadow: 0 18px 45px rgba(39, 63, 54, 0.08);
 }
 
+html[data-theme="dark"] {
+  color: #e6eee9;
+  background: #14251f;
+  --ink: #e6eee9;
+  --ink-strong: #f5f8f6;
+  --forest: #6db59e;
+  --forest-dark: #93cdb9;
+  --sage: #273e35;
+  --sage-soft: #1d322a;
+  --coral: #ef927d;
+  --coral-dark: #ffb09e;
+  --cream: #14251f;
+  --surface: #1b3028;
+  --line: #385146;
+  --muted: #a8bbb2;
+  --amber: #edb866;
+  --danger: #f28d82;
+  --shadow: 0 18px 45px rgba(0, 0, 0, .28);
+}
+
 * { box-sizing: border-box; }
 html { background: var(--cream); }
 body { margin: 0; min-width: 320px; min-height: 100vh; background: var(--cream); }
@@ -61,6 +81,7 @@ nav b { margin-left: auto; padding: 2px 7px; color: #fff; background: var(--cora
 nav a.active .nav-badge { color: #fff; background: var(--coral-dark); border-color: #f8f5ed; }
 .profile { position: relative; z-index: 1; display: flex; align-items: center; gap: 11px; margin-top: auto; padding: 20px 5px 0; border-top: 1px solid rgba(255,255,255,.13); font-size: .84rem; }
 .profile-actions { display: flex; gap: 7px; margin-left: auto; }
+.mobile-profile-actions { display: none; }
 .avatar { width: 38px; height: 38px; display: grid; flex: 0 0 38px; place-items: center; color: #315c4e; background: #e4eee7; border: 2px solid rgba(255,255,255,.55); border-radius: 50%; font-weight: 800; }
 .profile .avatar { color: #fff; background: rgba(255,255,255,.14); }
 
@@ -516,6 +537,8 @@ legend { margin-bottom: 10px; color: #40554d; font-size: .82rem; font-weight: 80
   .sidebar { position: sticky; inset: 0; top: 0; width: auto; padding: 12px 14px; background: #214f43; }
   .sidebar::after, .family-switcher, .profile { display: none; }
   .brand { margin: 0 0 9px; padding-left: 4px; }
+  .mobile-profile-actions { position: absolute; z-index: 2; top: 9px; right: 14px; display: flex; gap: 6px; }
+  .mobile-profile-actions .icon-button { width: 34px; height: 34px; }
   .brand svg { width: 31px; height: 31px; padding: 6px; border-radius: 10px; }
   nav { display: flex; gap: 5px; overflow: auto; }
   nav a { flex: 1 0 auto; justify-content: center; gap: 7px; padding: 8px 10px; white-space: nowrap; }
@@ -576,3 +599,81 @@ legend { margin-bottom: 10px; color: #40554d; font-size: .82rem; font-weight: 80
 @media (forced-colors: active) {
   select { padding-right: 12px; background-image: none; border: 1px solid ButtonText; appearance: auto; }
 }
+
+/* Dark mode keeps the existing hierarchy while replacing bright fixed surfaces. */
+html[data-theme="dark"] .sidebar { background: radial-gradient(circle at 20% 8%, rgba(255,255,255,.07) 0 2px, transparent 3px), linear-gradient(165deg, #204b40 0%, #18382f 58%, #102a23 100%); }
+html[data-theme="dark"] nav a.active { color: #eaf4ee; background: #29483d; }
+html[data-theme="dark"] nav a.active svg { color: var(--coral); }
+html[data-theme="dark"] .button { color: #dce9e3; background: #2a4339; }
+html[data-theme="dark"] .button.secondary { color: #dce9e3; background: #20382f; border-color: var(--line); }
+html[data-theme="dark"] .button.secondary:hover:not(:disabled) { background: #2a493e; }
+html[data-theme="dark"] .button.primary { color: #11251e; background: var(--forest); }
+html[data-theme="dark"] .button.primary:hover:not(:disabled) { background: var(--forest-dark); }
+html[data-theme="dark"] .icon-button { color: #d7e7df; background: #233d33; border-color: var(--line); }
+html[data-theme="dark"] input,
+html[data-theme="dark"] textarea,
+html[data-theme="dark"] select,
+html[data-theme="dark"] .rbc-toolbar button { color: var(--ink); background-color: #193028; border-color: #3d594d; }
+html[data-theme="dark"] select { background-image: linear-gradient(45deg, transparent 50%, #9bc9b9 50%), linear-gradient(135deg, #9bc9b9 50%, transparent 50%), linear-gradient(to right, #3b574b, #3b574b); }
+html[data-theme="dark"] select option,
+html[data-theme="dark"] select optgroup { color: var(--ink); background: #193028; }
+html[data-theme="dark"] input[type="date"],
+html[data-theme="dark"] input[type="datetime-local"] { color-scheme: dark; }
+html[data-theme="dark"] .panel,
+html[data-theme="dark"] .summary-card,
+html[data-theme="dark"] .expense-card,
+html[data-theme="dark"] .audit-entry-card,
+html[data-theme="dark"] .filterbar,
+html[data-theme="dark"] .tabbar,
+html[data-theme="dark"] .rbc-header,
+html[data-theme="dark"] .rbc-off-range-bg,
+html[data-theme="dark"] .rbc-toolbar button:hover,
+html[data-theme="dark"] .expense-row:hover,
+html[data-theme="dark"] .expense-card footer,
+html[data-theme="dark"] .format-toggle > label,
+html[data-theme="dark"] .event-detail-hero > div { background: #20382f; border-color: var(--line); }
+html[data-theme="dark"] .timeline-item,
+html[data-theme="dark"] .expense-item,
+html[data-theme="dark"] .activity-row,
+html[data-theme="dark"] .detail-list > div,
+html[data-theme="dark"] .audit-panel > header,
+html[data-theme="dark"] .breakdown-table > div,
+html[data-theme="dark"] .composer-actions { border-color: #385146; }
+html[data-theme="dark"] .date-block,
+html[data-theme="dark"] .group-count,
+html[data-theme="dark"] .audit-context span,
+html[data-theme="dark"] .bubble,
+html[data-theme="dark"] .check,
+html[data-theme="dark"] .form-stack label.check { color: #dbe8e2; background: #243e34; border-color: var(--line); }
+html[data-theme="dark"] .own .bubble,
+html[data-theme="dark"] .type-toggle button.active { background: #315746; }
+html[data-theme="dark"] .bubble p,
+html[data-theme="dark"] .audit-entry-card > strong,
+html[data-theme="dark"] .rbc-calendar { color: var(--ink); }
+html[data-theme="dark"] .rbc-month-view,
+html[data-theme="dark"] .rbc-time-view,
+html[data-theme="dark"] .rbc-agenda-view,
+html[data-theme="dark"] .rbc-header,
+html[data-theme="dark"] .rbc-day-bg + .rbc-day-bg,
+html[data-theme="dark"] .rbc-month-row + .rbc-month-row,
+html[data-theme="dark"] .rbc-time-content > * + * > * { border-color: #3a5549; }
+html[data-theme="dark"] .rbc-today { background: #263f35; }
+html[data-theme="dark"] .notice.error,
+html[data-theme="dark"] .account-delete-note { color: #ffc0b8; background: #4a2c2b; border-color: #75423e; }
+html[data-theme="dark"] .notice.success,
+html[data-theme="dark"] .immutable-banner { color: #bde9d8; background: #1e4236; border-color: #326251; }
+html[data-theme="dark"] .message.decision .bubble,
+html[data-theme="dark"] .swap-box,
+html[data-theme="dark"] .split-preview { color: #f3d49b; background: #493b24; border-color: #6f592f; }
+html[data-theme="dark"] .format-toggle > label.selected { color: #bce5d5; background: #244a3c; border-color: #5d9f89; box-shadow: inset 0 0 0 1px #5d9f89; }
+html[data-theme="dark"] .auth-page { background: #14251f; }
+html[data-theme="dark"] .auth-card { background: rgba(27,48,40,.94); border-color: #385146; }
+html[data-theme="dark"] .auth-card label,
+html[data-theme="dark"] .export-card label,
+html[data-theme="dark"] .form-stack label,
+html[data-theme="dark"] .filterbar label,
+html[data-theme="dark"] .code-label { color: #d9e7e0; }
+html[data-theme="dark"] .demo-note,
+html[data-theme="dark"] .form-hint,
+html[data-theme="dark"] .receipt-input,
+html[data-theme="dark"] .receipt-preview { color: #c8ddd3; background: #213b31; border-color: #38574a; }

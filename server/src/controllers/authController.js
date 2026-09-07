@@ -34,6 +34,33 @@ export async function me(req, res) {
   res.json({ success: true, user: publicUser(req.user) });
 }
 
+export async function updateProfile(req, res) {
+  const name = String(req.body.name || "").trim();
+  const email = String(req.body.email || "").trim().toLowerCase();
+  const password = String(req.body.password || "");
+  if (name.length < 2 || name.length > 80 || !emailPattern.test(email)) {
+    throw new AppError(400, "Enter a name of at least 2 characters and a valid email address");
+  }
+
+  const session = req.dbSession;
+  const user = await User.findById(req.user._id).select("+password").session(session);
+  if (!user?.isActive) throw new AppError(401, "Account is unavailable");
+  const emailChanged = user.email !== email;
+  if (emailChanged) {
+    if (!password) throw new AppError(400, "Your current password is required to change your email address");
+    if (!(await bcrypt.compare(password, user.password))) throw new AppError(401, "Your current password is incorrect");
+    const existing = await User.exists({ email, _id: { $ne: user._id } }).session(session);
+    if (existing) throw new AppError(409, "An account with this email already exists");
+  }
+
+  const family = await Family.findOne({ parents: user._id }).session(session);
+  req.accountFamilyId = family?._id || null;
+  user.name = name;
+  user.email = email;
+  await user.save({ session });
+  res.json({ success: true, message: "Your profile has been updated.", user: publicUser(user) });
+}
+
 // User documents are deliberately deactivated rather than removed: their name,
 // messages, approvals, and audit entries must remain part of the family record.
 export async function deactivateAccount(req, res) {

@@ -24,6 +24,11 @@ export function AuthProvider({ children }) {
       await api("/auth/me", { method: "DELETE", body: JSON.stringify({ confirmation: "DELETE", password }) });
       sessionStorage.removeItem("coparent_token"); setUser(null);
     },
+    async updateProfile(name, email, password) {
+      const data = await api("/auth/me", { method: "PATCH", body: JSON.stringify({ name, email, password }) });
+      setUser(data.user);
+      return data.user;
+    },
     logout() { sessionStorage.removeItem("coparent_token"); setUser(null); },
   }), [user, loading]);
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

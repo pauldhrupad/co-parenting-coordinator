@@ -4,6 +4,7 @@ import { AppError } from "../utils/http.js";
 
 const ACTION_TEXT = {
   "user.registered": "created a parent account",
+  "user.profile_updated": "updated their profile",
   "user.deactivated": "deactivated their account",
   "family.created": "created the family space",
   "family.joined": "joined the family space",

@@ -1,4 +1,4 @@
-import { AlertTriangle, CalendarDays, Download, FileClock, IndianRupee, LayoutDashboard, LogOut, MessageSquareText, Scale, Trash2 } from "lucide-react";
+import { AlertTriangle, CalendarDays, Download, FileClock, IndianRupee, LayoutDashboard, LogOut, MessageSquareText, Moon, Pencil, Scale, Sun, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../lib/auth";
@@ -6,6 +6,7 @@ import { api } from "../lib/api";
 import { initials } from "../lib/format";
 import Modal from "./Modal";
 import { ErrorNotice } from "./Notice";
+import { useTheme } from "../lib/theme";
 
 const nav = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard, end: true },
@@ -17,7 +18,8 @@ const nav = [
 ];
 
 export default function Shell() {
-  const { user, logout, deleteAccount } = useAuth();
+  const { user, logout, deleteAccount, updateProfile } = useAuth();
+  const { theme, toggleTheme } = useTheme();
   const location = useLocation();
   const navigate = useNavigate();
   const [pending, setPending] = useState({ pendingSwaps: 0, proposedExpenses: 0 });
@@ -26,6 +28,12 @@ export default function Shell() {
   const [deleteConfirmation, setDeleteConfirmation] = useState("");
   const [deleteError, setDeleteError] = useState("");
   const [deleting, setDeleting] = useState(false);
+  const [profileOpen, setProfileOpen] = useState(false);
+  const [profileName, setProfileName] = useState("");
+  const [profileEmail, setProfileEmail] = useState("");
+  const [profilePassword, setProfilePassword] = useState("");
+  const [profileError, setProfileError] = useState("");
+  const [savingProfile, setSavingProfile] = useState(false);
   useEffect(() => {
     let active = true;
     const refresh = () => api("/notifications/pending-count").then((data) => { if (active) setPending(data.counts); }).catch(() => {});
@@ -34,6 +42,14 @@ export default function Shell() {
     return () => { active = false; window.clearInterval(timer); };
   }, [location.pathname]);
   const closeDelete = () => { if (!deleting) { setDeleteOpen(false); setDeletePassword(""); setDeleteConfirmation(""); setDeleteError(""); } };
+  const openProfile = () => { setProfileName(user?.displayName || ""); setProfileEmail(user?.email || ""); setProfilePassword(""); setProfileError(""); setProfileOpen(true); };
+  const closeProfile = () => { if (!savingProfile) { setProfileOpen(false); setProfilePassword(""); setProfileError(""); } };
+  const submitProfile = async (event) => {
+    event.preventDefault(); setProfileError(""); setSavingProfile(true);
+    try { await updateProfile(profileName, profileEmail, profilePassword); closeProfile(); }
+    catch (error) { setProfileError(error.message); }
+    finally { setSavingProfile(false); }
+  };
   const submitDeletion = async (event) => {
     event.preventDefault(); setDeleteError("");
     if (deleteConfirmation !== "DELETE") return setDeleteError('Type DELETE exactly to continue.');
@@ -50,9 +66,10 @@ export default function Shell() {
   return <div className="app-shell">
     <aside className="sidebar">
       <div className="brand"><Scale size={22}/><span>CoParent</span></div>
+      <div className="mobile-profile-actions"><button onClick={toggleTheme} className="icon-button dark" aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} theme`}>{theme === "dark" ? <Sun size={16}/> : <Moon size={16}/>}</button><button onClick={openProfile} className="icon-button dark" aria-label="Edit profile"><Pencil size={16}/></button></div>
       <div className="family-switcher"><small>YOUR FAMILY SPACE</small><strong><i className="online-dot"/> Shared family record</strong><span>One place. One clear history.</span></div>
       <nav aria-label="Primary navigation">{nav.map(({ to, label, icon: Icon, end, badgeKey }) => <NavLink key={to} to={to} end={end}><Icon size={18}/>{label}{badgeKey && pending[badgeKey] > 0 && <span className="nav-badge" aria-label={`${pending[badgeKey]} pending`}>{pending[badgeKey] > 99 ? "99+" : pending[badgeKey]}</span>}</NavLink>)}</nav>
-      <div className="profile"><div className="avatar">{initials(user?.displayName)}</div><div><strong>{user?.displayName}</strong><small>Parent account</small></div><div className="profile-actions"><button onClick={() => setDeleteOpen(true)} className="icon-button dark danger" aria-label="Delete account" title="Delete account"><Trash2 size={16}/></button><button onClick={logout} className="icon-button dark" aria-label="Log out" title="Log out"><LogOut size={17}/></button></div></div>
+      <div className="profile"><div className="avatar">{initials(user?.displayName)}</div><div><strong>{user?.displayName}</strong><small>Parent account</small></div><div className="profile-actions"><button onClick={toggleTheme} className="icon-button dark" aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} theme`} title={`Switch to ${theme === "dark" ? "light" : "dark"} theme`}>{theme === "dark" ? <Sun size={16}/> : <Moon size={16}/>}</button><button onClick={openProfile} className="icon-button dark" aria-label="Edit profile" title="Edit profile"><Pencil size={16}/></button><button onClick={() => setDeleteOpen(true)} className="icon-button dark danger" aria-label="Delete account" title="Delete account"><Trash2 size={16}/></button><button onClick={logout} className="icon-button dark" aria-label="Log out" title="Log out"><LogOut size={17}/></button></div></div>
     </aside>
     <main><Outlet /></main>
     {deleteOpen && <Modal title="Delete your account" description="This action permanently ends your access to CoParent." onClose={closeDelete}>
@@ -62,6 +79,15 @@ export default function Shell() {
         <label>Current password<input type="password" value={deletePassword} onChange={(event) => setDeletePassword(event.target.value)} autoComplete="current-password" required disabled={deleting}/></label>
         <label>Type <strong>DELETE</strong> to confirm<input value={deleteConfirmation} onChange={(event) => setDeleteConfirmation(event.target.value)} autoComplete="off" required disabled={deleting}/></label>
         <div className="modal-actions"><button type="button" className="button secondary" onClick={closeDelete} disabled={deleting}>Cancel</button><button className="button danger" disabled={deleting}>{deleting ? "Deleting account…" : "Delete my account"}</button></div>
+      </form>
+    </Modal>}
+    {profileOpen && <Modal title="Edit profile" description="Update how your name and email appear in your family space." onClose={closeProfile}>
+      <form className="form-stack" onSubmit={submitProfile}>
+        <ErrorNotice message={profileError}/>
+        <label>Display name<input value={profileName} onChange={(event) => setProfileName(event.target.value)} maxLength="80" required disabled={savingProfile}/></label>
+        <label>Email address<input type="email" value={profileEmail} onChange={(event) => setProfileEmail(event.target.value)} maxLength="254" required disabled={savingProfile}/></label>
+        <label>Current password <small>Required only when changing your email address.</small><input type="password" value={profilePassword} onChange={(event) => setProfilePassword(event.target.value)} autoComplete="current-password" disabled={savingProfile}/></label>
+        <div className="modal-actions"><button type="button" className="button secondary" onClick={closeProfile} disabled={savingProfile}>Cancel</button><button className="button primary" disabled={savingProfile}>{savingProfile ? "Saving…" : "Save profile"}</button></div>
       </form>
     </Modal>}
   </div>;

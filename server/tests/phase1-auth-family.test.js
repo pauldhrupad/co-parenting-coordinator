@@ -121,4 +121,23 @@ describe("Phase 1 authentication and family invitation flow", () => {
     expect(audit.familyId.equals(created.body.family._id)).toBe(true);
     expect(audit.newState.isActive).toBe(false);
   });
+
+  it("updates a profile, requires the current password for an email change, and audits the update", async () => {
+    const first = await register("First Parent", "first@example.com");
+    const created = await request(app).post("/api/family/create").set("Authorization", `Bearer ${first.body.token}`).send({ name: "Shared Family", children: [{ name: "Child", dob: "2019-03-02" }] });
+
+    const renamed = await request(app).patch("/api/auth/me").set("Authorization", `Bearer ${first.body.token}`).send({ name: "Updated Parent", email: "first@example.com" });
+    expect(renamed.status).toBe(200);
+    expect(renamed.body.user.displayName).toBe("Updated Parent");
+
+    const withoutPassword = await request(app).patch("/api/auth/me").set("Authorization", `Bearer ${first.body.token}`).send({ name: "Updated Parent", email: "updated@example.com" });
+    expect(withoutPassword.status).toBe(400);
+
+    const changedEmail = await request(app).patch("/api/auth/me").set("Authorization", `Bearer ${first.body.token}`).send({ name: "Updated Parent", email: "updated@example.com", password: "Password1!" });
+    expect(changedEmail.status).toBe(200);
+    expect(changedEmail.body.user.email).toBe("updated@example.com");
+    const audit = await AuditLog.findOne({ action: "user.profile_updated" }).sort({ timestamp: -1 });
+    expect(audit.familyId.equals(created.body.family._id)).toBe(true);
+    expect(audit.newState.email).toBe("updated@example.com");
+  });
 });

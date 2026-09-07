@@ -1,5 +1,6 @@
 import { Navigate, Route, Routes } from "react-router-dom";
 import { AuthProvider, useAuth } from "./lib/auth";
+import { ThemeProvider } from "./lib/theme";
 import Shell from "./components/Shell";
 import ProtectedRoute from "./components/ProtectedRoute";
 import LoginPage from "./pages/LoginPage";
@@ -35,5 +36,5 @@ function AppRoutes() {
 }
 
 export default function App() {
-  return <AuthProvider><AppRoutes /></AuthProvider>;
+  return <ThemeProvider><AuthProvider><AppRoutes /></AuthProvider></ThemeProvider>;
 }
