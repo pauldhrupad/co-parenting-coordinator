@@ -1,4 +1,4 @@
-import { AlertTriangle, CalendarDays, Download, Ellipsis, FileClock, IndianRupee, LayoutDashboard, LogOut, MessageSquareText, Moon, Pencil, Scale, Sun, Trash2, UserRound } from "lucide-react";
+import { AlertTriangle, CalendarDays, Download, Ellipsis, FileClock, IndianRupee, LayoutDashboard, LogOut, MessageSquareText, Moon, Pencil, Sun, Trash2, UserRound } from "lucide-react";
 import { useEffect, useState } from "react";
 import { NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../lib/auth";
@@ -7,6 +7,7 @@ import { initials } from "../lib/format";
 import Modal from "./Modal";
 import { ErrorNotice } from "./Notice";
 import { useTheme } from "../lib/theme";
+import BrandMark from "./BrandMark";
 
 const nav = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard, end: true },
@@ -79,7 +80,7 @@ export default function Shell() {
   };
   return <div className="app-shell">
     <aside className="sidebar">
-      <div className="brand"><Scale size={22}/><span>CoParent</span></div>
+      <div className="brand"><BrandMark/><span>CoParent</span></div>
       <button data-account-trigger className="mobile-account-trigger icon-button dark" onClick={() => setAccountMenuOpen((value) => !value)} aria-label="Open account menu" aria-expanded={accountMenuOpen}><UserRound size={17}/></button>
       <div className="family-switcher"><small>YOUR FAMILY SPACE</small><strong><i className="online-dot"/> Shared family record</strong><span>One place. One clear history.</span></div>
       <nav aria-label="Primary navigation">{nav.map(({ to, label, icon: Icon, end, badgeKey }) => <NavLink key={to} to={to} end={end}><Icon size={18}/>{label}{badgeKey && pending[badgeKey] > 0 && <span className="nav-badge" aria-label={`${pending[badgeKey]} pending`}>{pending[badgeKey] > 99 ? "99+" : pending[badgeKey]}</span>}</NavLink>)}</nav>

@@ -1,9 +1,10 @@
 import { useState } from "react";
-import { CalendarDays, CheckCircle2, IndianRupee, MessageSquareText, Scale } from "lucide-react";
+import { CalendarDays, CheckCircle2, IndianRupee, MessageSquareText } from "lucide-react";
 import { useAuth } from "../lib/auth";
 import { ErrorNotice } from "../components/Notice";
 import { Link, useNavigate } from "react-router-dom";
 import { api } from "../lib/api";
+import BrandMark from "../components/BrandMark";
 
 export default function LoginPage({ mode = "login" }) {
   const { login, register } = useAuth();
@@ -34,7 +35,7 @@ export default function LoginPage({ mode = "login" }) {
   };
   return <div className="auth-page">
     <section className="auth-intro">
-      <div className="brand large"><Scale size={28}/><span>CoParent</span></div>
+      <div className="brand large"><BrandMark size={28}/><span>CoParent</span></div>
       <div className="auth-copy"><span className="eyebrow light">A CALMER WAY TO CO-PARENT</span><h1>Less friction.<br/>More clarity for your family.</h1><p>Keep schedules, shared costs, and important decisions in one dependable family space.</p>
         <ul><li><CalendarDays/> Shared custody calendar</li><li><IndianRupee/> Transparent expense approval</li><li><MessageSquareText/> Permanent communication log</li><li><CheckCircle2/> Timestamped activity history</li></ul>
       </div>
