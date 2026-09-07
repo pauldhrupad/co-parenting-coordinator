@@ -2,6 +2,15 @@
 
 This guide deploys the monorepo to MongoDB Atlas, Render, and Vercel. Complete it in order because the backend URL is needed by Vercel and the final Vercel URL is needed by backend CORS.
 
+## Production deployment record
+
+- Frontend: https://co-parenting-coordinator.vercel.app
+- Backend health check: https://coparent-api-w1yl.onrender.com/api/health
+- Source repository: https://github.com/pauldhrupad/co-parenting-coordinator
+- Verified on: 7 September 2026
+
+The verified CORS policy permits the exact Vercel production origin and omits the allow-origin header for localhost and unrelated origins.
+
 ## 1. Credential safety gate
 
 The MongoDB credential used during development has been shared outside its intended secret store. Treat it as compromised even if it was never committed.

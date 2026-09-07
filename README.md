@@ -4,10 +4,10 @@
 
 ## Live demo
 
-- **Frontend:** `https://YOUR-VERCEL-PROJECT.vercel.app`
-- **Backend health check:** `https://YOUR-RENDER-SERVICE.onrender.com/api/health`
+- **Frontend:** https://co-parenting-coordinator.vercel.app
+- **Backend health check:** https://coparent-api-w1yl.onrender.com/api/health
 
-The links above are deployment placeholders. Replace them with verified production URLs after completing the [deployment checklist](docs/deployment.md). A free Render service may take approximately one minute to respond after it has been idle.
+Both links were verified in production on 7 September 2026. A free Render service may take approximately one minute to respond after it has been idle.
 
 ## Problem statement
 
@@ -121,7 +121,7 @@ docs/                  API, testing, deployment, and report documentation
 ### Installation
 
 ```bash
-git clone https://github.com/YOUR-GITHUB-USERNAME/co-parenting-coordinator.git
+git clone https://github.com/pauldhrupad/co-parenting-coordinator.git
 cd co-parenting-coordinator
 npm ci
 ```
