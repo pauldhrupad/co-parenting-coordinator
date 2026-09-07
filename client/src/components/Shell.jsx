@@ -1,4 +1,4 @@
-import { AlertTriangle, CalendarDays, Download, FileClock, IndianRupee, LayoutDashboard, LogOut, MessageSquareText, Moon, Pencil, Scale, Sun, Trash2 } from "lucide-react";
+import { AlertTriangle, CalendarDays, Download, Ellipsis, FileClock, IndianRupee, LayoutDashboard, LogOut, MessageSquareText, Moon, Pencil, Scale, Sun, Trash2, UserRound } from "lucide-react";
 import { useEffect, useState } from "react";
 import { NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../lib/auth";
@@ -34,6 +34,7 @@ export default function Shell() {
   const [profilePassword, setProfilePassword] = useState("");
   const [profileError, setProfileError] = useState("");
   const [savingProfile, setSavingProfile] = useState(false);
+  const [accountMenuOpen, setAccountMenuOpen] = useState(false);
   useEffect(() => {
     let active = true;
     const refresh = () => api("/notifications/pending-count").then((data) => { if (active) setPending(data.counts); }).catch(() => {});
@@ -41,8 +42,21 @@ export default function Shell() {
     const timer = window.setInterval(refresh, 45000);
     return () => { active = false; window.clearInterval(timer); };
   }, [location.pathname]);
+  useEffect(() => {
+    if (!accountMenuOpen) return undefined;
+    const closeOnOutsideClick = (event) => {
+      if (!event.target.closest(".account-menu") && !event.target.closest("[data-account-trigger]")) setAccountMenuOpen(false);
+    };
+    const closeOnEscape = (event) => { if (event.key === "Escape") setAccountMenuOpen(false); };
+    document.addEventListener("pointerdown", closeOnOutsideClick);
+    document.addEventListener("keydown", closeOnEscape);
+    return () => {
+      document.removeEventListener("pointerdown", closeOnOutsideClick);
+      document.removeEventListener("keydown", closeOnEscape);
+    };
+  }, [accountMenuOpen]);
   const closeDelete = () => { if (!deleting) { setDeleteOpen(false); setDeletePassword(""); setDeleteConfirmation(""); setDeleteError(""); } };
-  const openProfile = () => { setProfileName(user?.displayName || ""); setProfileEmail(user?.email || ""); setProfilePassword(""); setProfileError(""); setProfileOpen(true); };
+  const openProfile = () => { setAccountMenuOpen(false); setProfileName(user?.displayName || ""); setProfileEmail(user?.email || ""); setProfilePassword(""); setProfileError(""); setProfileOpen(true); };
   const closeProfile = () => { if (!savingProfile) { setProfileOpen(false); setProfilePassword(""); setProfileError(""); } };
   const submitProfile = async (event) => {
     event.preventDefault(); setProfileError(""); setSavingProfile(true);
@@ -66,10 +80,18 @@ export default function Shell() {
   return <div className="app-shell">
     <aside className="sidebar">
       <div className="brand"><Scale size={22}/><span>CoParent</span></div>
-      <div className="mobile-profile-actions"><button onClick={toggleTheme} className="icon-button dark" aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} theme`}>{theme === "dark" ? <Sun size={16}/> : <Moon size={16}/>}</button><button onClick={openProfile} className="icon-button dark" aria-label="Edit profile"><Pencil size={16}/></button></div>
+      <button data-account-trigger className="mobile-account-trigger icon-button dark" onClick={() => setAccountMenuOpen((value) => !value)} aria-label="Open account menu" aria-expanded={accountMenuOpen}><UserRound size={17}/></button>
       <div className="family-switcher"><small>YOUR FAMILY SPACE</small><strong><i className="online-dot"/> Shared family record</strong><span>One place. One clear history.</span></div>
       <nav aria-label="Primary navigation">{nav.map(({ to, label, icon: Icon, end, badgeKey }) => <NavLink key={to} to={to} end={end}><Icon size={18}/>{label}{badgeKey && pending[badgeKey] > 0 && <span className="nav-badge" aria-label={`${pending[badgeKey]} pending`}>{pending[badgeKey] > 99 ? "99+" : pending[badgeKey]}</span>}</NavLink>)}</nav>
-      <div className="profile"><div className="avatar">{initials(user?.displayName)}</div><div><strong>{user?.displayName}</strong><small>Parent account</small></div><div className="profile-actions"><button onClick={toggleTheme} className="icon-button dark" aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} theme`} title={`Switch to ${theme === "dark" ? "light" : "dark"} theme`}>{theme === "dark" ? <Sun size={16}/> : <Moon size={16}/>}</button><button onClick={openProfile} className="icon-button dark" aria-label="Edit profile" title="Edit profile"><Pencil size={16}/></button><button onClick={() => setDeleteOpen(true)} className="icon-button dark danger" aria-label="Delete account" title="Delete account"><Trash2 size={16}/></button><button onClick={logout} className="icon-button dark" aria-label="Log out" title="Log out"><LogOut size={17}/></button></div></div>
+      <div className="profile"><div className="avatar">{initials(user?.displayName)}</div><div className="profile-copy"><strong title={user?.displayName}>{user?.displayName}</strong><small>Parent account</small></div><button data-account-trigger onClick={() => setAccountMenuOpen((value) => !value)} className="icon-button dark account-trigger" aria-label="Open account menu" aria-expanded={accountMenuOpen} title="Account settings"><Ellipsis size={19}/></button></div>
+      {accountMenuOpen && <div className="account-menu" role="group" aria-label="Account settings">
+        <header><div className="account-menu-avatar">{initials(user?.displayName)}</div><div><strong>{user?.displayName}</strong><span>{user?.email}</span></div></header>
+        <button onClick={openProfile}><Pencil size={17}/><span><strong>Edit profile</strong><small>Update your name and email</small></span></button>
+        <button onClick={() => { toggleTheme(); setAccountMenuOpen(false); }}>{theme === "dark" ? <Sun size={17}/> : <Moon size={17}/>}<span><strong>Appearance</strong><small>Switch to {theme === "dark" ? "light" : "dark"} theme</small></span></button>
+        <div className="account-menu-divider"/>
+        <button onClick={() => { setAccountMenuOpen(false); logout(); }}><LogOut size={17}/><span><strong>Sign out</strong><small>End this session safely</small></span></button>
+        <button className="danger" onClick={() => { setAccountMenuOpen(false); setDeleteOpen(true); }}><Trash2 size={17}/><span><strong>Delete account</strong><small>Permanently end account access</small></span></button>
+      </div>}
     </aside>
     <main><Outlet /></main>
     {deleteOpen && <Modal title="Delete your account" description="This action permanently ends your access to CoParent." onClose={closeDelete}>

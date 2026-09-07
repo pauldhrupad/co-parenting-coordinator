@@ -63,7 +63,7 @@ button { cursor: pointer; }
   background: radial-gradient(circle at 20% 8%, rgba(255,255,255,.09) 0 2px, transparent 3px), linear-gradient(165deg, #2d6154 0%, #214d42 58%, #183d35 100%);
   box-shadow: 10px 0 35px rgba(27, 58, 49, .08);
 }
-.sidebar::after { content: ""; position: absolute; right: -1px; bottom: 0; width: 150px; height: 150px; opacity: .18; background: radial-gradient(circle, #f1c98a 0 2px, transparent 2.5px); background-size: 18px 18px; pointer-events: none; }
+.sidebar::after { content: ""; position: absolute; left: 20px; right: 20px; bottom: 79px; height: 1px; background: rgba(255,255,255,.12); pointer-events: none; }
 .brand { position: relative; z-index: 1; display: flex; align-items: center; gap: 11px; padding: 0 9px; font: 800 1.22rem Manrope, sans-serif; letter-spacing: -.03em; }
 .brand svg { padding: 7px; width: 36px; height: 36px; color: #fff; background: var(--coral); border-radius: 12px; box-shadow: 0 8px 18px rgba(12, 40, 32, .2); }
 .family-switcher { position: relative; z-index: 1; margin: 31px 0 24px; padding: 15px 16px; background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.13); border-radius: 16px; backdrop-filter: blur(8px); }
@@ -79,9 +79,33 @@ nav a.active svg { color: var(--coral-dark); }
 nav b { margin-left: auto; padding: 2px 7px; color: #fff; background: var(--coral); border-radius: 20px; font-size: .7rem; }
 .nav-badge { min-width: 22px; height: 22px; display: grid; place-items: center; margin-left: auto; padding: 0 6px; color: #fff; background: var(--coral); border: 2px solid rgba(255,255,255,.22); border-radius: 20px; font-size: .64rem; font-weight: 800; }
 nav a.active .nav-badge { color: #fff; background: var(--coral-dark); border-color: #f8f5ed; }
-.profile { position: relative; z-index: 1; display: flex; align-items: center; gap: 11px; margin-top: auto; padding: 20px 5px 0; border-top: 1px solid rgba(255,255,255,.13); font-size: .84rem; }
-.profile-actions { display: flex; gap: 7px; margin-left: auto; }
-.mobile-profile-actions { display: none; }
+.profile { position: relative; z-index: 1; display: flex; align-items: center; gap: 11px; margin-top: auto; padding: 20px 4px 0; font-size: .84rem; }
+.profile-copy { min-width: 0; flex: 1; }
+.profile-copy strong, .profile-copy small { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.profile-copy strong { display: block; color: #f3f8f5; }
+.profile-copy small { margin: 3px 0 0; font-size: .72rem; font-weight: 400; letter-spacing: .01em; }
+.sidebar .account-menu { max-height: calc(100dvh - 110px); overflow-y: auto; }
+.account-menu button:focus-visible, [data-account-trigger]:focus-visible { outline: 2px solid var(--coral); outline-offset: 2px; }
+.account-trigger { flex: 0 0 38px; margin-left: auto; }
+.account-trigger[aria-expanded="true"] { color: #fff; background: rgba(255,255,255,.16); }
+.sidebar .mobile-account-trigger { display: none; }
+.account-menu { position: absolute; z-index: 30; left: 16px; right: 16px; bottom: 88px; overflow: hidden; padding: 8px; color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: 17px; box-shadow: 0 22px 55px rgba(7, 25, 19, .3); animation: account-menu-in .16s ease-out; }
+.account-menu::after { content: ""; position: absolute; right: 22px; bottom: -6px; width: 12px; height: 12px; transform: rotate(45deg); background: var(--surface); border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.account-menu header { display: grid; grid-template-columns: 36px minmax(0, 1fr); align-items: center; gap: 10px; margin: 0 2px 6px; padding: 8px 8px 12px; border-bottom: 1px solid var(--line); }
+.account-menu header > div:last-child { min-width: 0; }
+.account-menu header strong, .account-menu header span { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.account-menu header strong { color: var(--ink-strong); font-size: .82rem; }
+.account-menu header span { margin-top: 2px; color: var(--muted); font-size: .66rem; }
+.account-menu-avatar { width: 36px; height: 36px; display: grid; place-items: center; color: #fff; background: var(--forest); border-radius: 11px; font-weight: 800; }
+.account-menu > button { width: 100%; display: grid; grid-template-columns: 30px 1fr; align-items: center; gap: 7px; padding: 9px 8px; color: var(--ink); text-align: left; background: transparent; border: 0; border-radius: 10px; }
+.account-menu > button:hover { background: var(--sage-soft); }
+.account-menu > button > svg { color: var(--forest); }
+.account-menu > button span, .account-menu > button strong, .account-menu > button small { display: block; }
+.account-menu > button strong { color: var(--ink-strong); font-size: .77rem; }
+.account-menu > button small { margin-top: 2px; color: var(--muted); font-size: .62rem; }
+.account-menu > button.danger > svg, .account-menu > button.danger strong { color: var(--danger); }
+.account-menu-divider { height: 1px; margin: 5px 7px; background: var(--line); }
+@keyframes account-menu-in { from { opacity: 0; transform: translateY(7px) scale(.98); } }
 .avatar { width: 38px; height: 38px; display: grid; flex: 0 0 38px; place-items: center; color: #315c4e; background: #e4eee7; border: 2px solid rgba(255,255,255,.55); border-radius: 50%; font-weight: 800; }
 .profile .avatar { color: #fff; background: rgba(255,255,255,.14); }
 
@@ -537,8 +561,9 @@ legend { margin-bottom: 10px; color: #40554d; font-size: .82rem; font-weight: 80
   .sidebar { position: sticky; inset: 0; top: 0; width: auto; padding: 12px 14px; background: #214f43; }
   .sidebar::after, .family-switcher, .profile { display: none; }
   .brand { margin: 0 0 9px; padding-left: 4px; }
-  .mobile-profile-actions { position: absolute; z-index: 2; top: 9px; right: 14px; display: flex; gap: 6px; }
-  .mobile-profile-actions .icon-button { width: 34px; height: 34px; }
+  .sidebar .mobile-account-trigger { position: absolute; z-index: 2; top: 10px; right: 14px; display: grid; width: 34px; height: 34px; }
+  .account-menu { position: fixed; top: 54px; right: 14px; bottom: auto; left: auto; width: min(260px, calc(100vw - 28px)); }
+  .account-menu::after { top: -6px; right: 12px; bottom: auto; border: 0; border-left: 1px solid var(--line); border-top: 1px solid var(--line); }
   .brand svg { width: 31px; height: 31px; padding: 6px; border-radius: 10px; }
   nav { display: flex; gap: 5px; overflow: auto; }
   nav a { flex: 1 0 auto; justify-content: center; gap: 7px; padding: 8px 10px; white-space: nowrap; }
