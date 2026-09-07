@@ -1,4 +1,4 @@
-export const PARENT_COLORS = ["#3f78b5", "#397863"];
+export const PARENT_COLORS = ["var(--parent-a)", "var(--parent-b)"];
 
 export function entityId(value) {
   if (!value) return "";
@@ -31,14 +31,14 @@ export function eventVisualStyle(event, family) {
   const parentColor = PARENT_COLORS[parentIndex % PARENT_COLORS.length];
 
   if (event.status === "disputed") {
-    return { backgroundColor: "#b95750", border: "2px solid #963f3a", color: "#fff" };
+    return { backgroundColor: "var(--event-disputed)", border: "2px solid var(--event-disputed)", color: "var(--event-ink)" };
   }
 
   if (event.status === "pending-swap") {
-    return { backgroundColor: parentColor, border: "2px dashed rgba(255,255,255,.9)", color: "#fff", opacity: .7 };
+    return { backgroundColor: parentColor, border: "2px dashed var(--event-ink)", color: "var(--event-ink)", opacity: .98 };
   }
 
-  return { backgroundColor: parentColor, border: `2px solid ${parentColor}`, color: "#fff", opacity: 1 };
+  return { backgroundColor: parentColor, border: `2px solid ${parentColor}`, color: "var(--event-ink)", opacity: 1 };
 }
 
 export function friendlyCustodyError(error) {

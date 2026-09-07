@@ -9,7 +9,7 @@ import { toInputDateTime } from "../../lib/format";
 import { SuccessNotice } from "../Notice";
 import CustodyEventModal from "./CustodyEventModal";
 import { CreateEventModal, SwapRequestModal } from "./CustodyEventForms";
-import { applyAcceptedSwap, childName, entityId, eventTypeLabel, eventVisualStyle, friendlyCustodyError, toCalendarEvent } from "./calendarUtils";
+import { PARENT_COLORS, applyAcceptedSwap, childName, entityId, eventTypeLabel, eventVisualStyle, friendlyCustodyError, toCalendarEvent } from "./calendarUtils";
 
 const localizer = dateFnsLocalizer({
   format,
@@ -177,7 +177,7 @@ export default function CustodyCalendar({ family, user }) {
           </select>
         </label>
         <div className="parent-legend" aria-label="Calendar color legend">
-          {family.parents.map((parent, index) => <span key={parent._id}><i style={{ backgroundColor: ["#3f78b5", "#397863"][index] }}/>{parent.displayName}</span>)}
+          {family.parents.map((parent, index) => <span key={parent._id}><i style={{ backgroundColor: PARENT_COLORS[index] }}/>{parent.displayName}</span>)}
           <span><i className="dashed"/>Pending swap</span>
         </div>
       </div>
