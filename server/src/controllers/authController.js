@@ -1,7 +1,7 @@
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { config } from "../config.js";
-import { User } from "../models/index.js";
+import { Family, User } from "../models/index.js";
 import { AppError, publicUser } from "../utils/http.js";
 
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -32,4 +32,29 @@ export async function login(req, res) {
 
 export async function me(req, res) {
   res.json({ success: true, user: publicUser(req.user) });
+}
+
+// User documents are deliberately deactivated rather than removed: their name,
+// messages, approvals, and audit entries must remain part of the family record.
+export async function deactivateAccount(req, res) {
+  const confirmation = String(req.body.confirmation || "");
+  const password = String(req.body.password || "");
+  if (confirmation !== "DELETE") throw new AppError(400, 'Type DELETE to confirm account deletion');
+  if (!password) throw new AppError(400, "Your current password is required");
+
+  const session = req.dbSession;
+  const user = await User.findById(req.user._id).select("+password").session(session);
+  if (!user?.isActive) throw new AppError(401, "Account is unavailable");
+  if (!(await bcrypt.compare(password, user.password))) throw new AppError(401, "Your current password is incorrect");
+
+  const family = await Family.findOne({ parents: user._id }).session(session);
+  req.accountFamilyId = family?._id || null;
+  user.isActive = false;
+  await user.save({ session });
+
+  res.json({
+    success: true,
+    message: "Your account has been deactivated and you have been signed out.",
+    user: { ...publicUser(user), isActive: false },
+  });
 }

@@ -5,7 +5,7 @@ import jwt from "jsonwebtoken";
 import request from "supertest";
 import app from "../src/app.js";
 import { config } from "../src/config.js";
-import { Family } from "../src/models/index.js";
+import { AuditLog, Family } from "../src/models/index.js";
 
 let replica;
 
@@ -99,5 +99,26 @@ describe("Phase 1 authentication and family invitation flow", () => {
     const full = await request(app).post(`/api/family/join/${created.body.inviteCode}`).set("Authorization", `Bearer ${third.body.token}`);
     expect(full.status).toBe(409);
     expect(full.body.message).toMatch(/two parents/i);
+  });
+
+  it("deactivates an account only after password and explicit confirmation, while preserving its audit record", async () => {
+    const first = await register("First Parent", "first@example.com");
+    const created = await request(app).post("/api/family/create").set("Authorization", `Bearer ${first.body.token}`).send({ name: "Shared Family", children: [{ name: "Child", dob: "2019-03-02" }] });
+
+    const missingConfirmation = await request(app).delete("/api/auth/me").set("Authorization", `Bearer ${first.body.token}`).send({ password: "Password1!" });
+    expect(missingConfirmation.status).toBe(400);
+
+    const deleted = await request(app).delete("/api/auth/me").set("Authorization", `Bearer ${first.body.token}`).send({ password: "Password1!", confirmation: "DELETE" });
+    expect(deleted.status).toBe(200);
+    expect(deleted.body.user.isActive).toBe(false);
+
+    const afterDeletion = await request(app).get("/api/auth/me").set("Authorization", `Bearer ${first.body.token}`);
+    expect(afterDeletion.status).toBe(401);
+    const relogin = await request(app).post("/api/auth/login").send({ email: "first@example.com", password: "Password1!" });
+    expect(relogin.status).toBe(401);
+
+    const audit = await AuditLog.findOne({ action: "user.deactivated" });
+    expect(audit.familyId.equals(created.body.family._id)).toBe(true);
+    expect(audit.newState.isActive).toBe(false);
   });
 });

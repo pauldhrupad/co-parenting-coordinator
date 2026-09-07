@@ -20,6 +20,10 @@ export function AuthProvider({ children }) {
       const data = await api("/auth/register", { method: "POST", body: JSON.stringify({ name, email, password }) });
       sessionStorage.setItem("coparent_token", data.token); setUser(data.user);
     },
+    async deleteAccount(password) {
+      await api("/auth/me", { method: "DELETE", body: JSON.stringify({ confirmation: "DELETE", password }) });
+      sessionStorage.removeItem("coparent_token"); setUser(null);
+    },
     logout() { sessionStorage.removeItem("coparent_token"); setUser(null); },
   }), [user, loading]);
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
